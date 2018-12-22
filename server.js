@@ -71,8 +71,8 @@ function _createURL(url, cb) {
     .catch(err => cb(err));
 }
 
-app.get("/api/shorturl/new", (req, res) => {
-  const url = req.query.url;
+app.post("/api/shorturl/new", (req, res) => {
+  const url = req.body.url;
   const hostname = _getHostName(url);
 
   hostname
@@ -84,6 +84,14 @@ app.get("/api/shorturl/new", (req, res) => {
             )
       )
     : res.json({ error: "invalid URL" });
+});
+
+app.get("/api/shorturl/:index", (req, res) => {
+  const index = req.params.index;
+  index ? ShortURL.findOne({ short_url: index })
+    .then(data => res.redirect(data.original_url))
+    .catch(err => res.json({ error: "no url found with index of " + index }))
+  : res.json({error: "index is not specified"})
 });
 
 app.listen(port, function() {
